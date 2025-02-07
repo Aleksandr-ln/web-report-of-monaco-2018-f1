@@ -18,7 +18,11 @@ DATE_FORMAT = "%Y-%m-%d_%H:%M:%S.%f"
 
 class TestReportFunctions(unittest.TestCase):
 
-    @patch("builtins.open", new_callable=mock_open, read_data="ABC2018-05-24_12:00:00.000\nXYZ2018-05-24_12:01:01.123")
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data="ABC2018-05-24_12:00:00.000\nXYZ2018-05-24_12:01:01.123"
+    )
     def test_parse_log(self, mock_file):
         expected_result = {
             "ABC": datetime.strptime("2018-05-24_12:00:00.000", DATE_FORMAT),
@@ -26,7 +30,11 @@ class TestReportFunctions(unittest.TestCase):
         }
         self.assertEqual(parse_log("fake_path.log"), expected_result)
 
-    @patch("builtins.open", new_callable=mock_open, read_data="LHM_Lewis Hamilton_MERCEDES\nSVF_Sebastian Vettel_FERRARI")
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data="LHM_Lewis Hamilton_MERCEDES\nSVF_Sebastian Vettel_FERRARI"
+    )
     def test_parse_abbreviations(self, mock_file):
         expected_result = {
             "LHM": Racer("Lewis Hamilton", "MERCEDES"),
@@ -49,8 +57,16 @@ class TestReportFunctions(unittest.TestCase):
         }
 
         expected_result = {
-            "LHM": Race(Racer("Lewis Hamilton", "MERCEDES"), datetime(2018, 5, 24, 12, 0, 0), datetime(2018, 5, 24, 12, 1, 0)),
-            "SVF": Race(Racer("Sebastian Vettel", "FERRARI"), datetime(2018, 5, 24, 12, 1, 1), datetime(2018, 5, 24, 12, 2, 1))
+            "LHM": Race(
+                Racer("Lewis Hamilton", "MERCEDES"),
+                datetime(2018, 5, 24, 12, 0, 0),
+                datetime(2018, 5, 24, 12, 1, 0)
+            ),
+            "SVF": Race(
+                Racer("Sebastian Vettel", "FERRARI"),
+                datetime(2018, 5, 24, 12, 1, 1),
+                datetime(2018, 5, 24, 12, 2, 1)
+            )
         }
 
         self.assertEqual(build_report(
@@ -62,8 +78,16 @@ class TestReportFunctions(unittest.TestCase):
 
     def test_sort_race_results(self):
         race_results = {
-            "LHM": Race(Racer("Lewis Hamilton", "MERCEDES"), datetime(2018, 5, 24, 12, 0, 0), datetime(2018, 5, 24, 12, 1, 0)),
-            "SVF": Race(Racer("Sebastian Vettel", "FERRARI"), datetime(2018, 5, 24, 12, 1, 1), datetime(2018, 5, 24, 12, 2, 1))
+            "LHM": Race(
+                Racer("Lewis Hamilton", "MERCEDES"),
+                datetime(2018, 5, 24, 12, 0, 0),
+                datetime(2018, 5, 24, 12, 1, 0)
+            ),
+            "SVF": Race(
+                Racer("Sebastian Vettel", "FERRARI"),
+                datetime(2018, 5, 24, 12, 1, 1),
+                datetime(2018, 5, 24, 12, 2, 1)
+            )
         }
         sorted_results = sort_race_results(race_results, order="asc")
 

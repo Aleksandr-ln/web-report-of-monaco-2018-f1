@@ -38,7 +38,12 @@ def report_drivers():
         key=lambda item: item[1].name,
         reverse=(order == "desc")
     )
-    return render_template("drivers.html", drivers=sorted_drivers, order=order, special_wikipedia_names=special_wikipedia_names)
+    return render_template(
+        "drivers.html",
+        drivers=sorted_drivers,
+        order=order,
+        special_wikipedia_names=special_wikipedia_names
+    )
 
 
 @app.route("/report/drivers/")
@@ -47,7 +52,10 @@ def driver_info():
     race_results = build_report(START_LOG, END_LOG, ABBREVIATIONS_FILE)
     driver_data = race_results.get(driver_id)
     if not driver_data:
-        return render_template("driver_not_found.html", driver_id=driver_id), 404
+        return render_template(
+            "driver_not_found.html",
+            driver_id=driver_id
+        ), 404
     return render_template(
         "driver_info.html",
         driver=driver_data,

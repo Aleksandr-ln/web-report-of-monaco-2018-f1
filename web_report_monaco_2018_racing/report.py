@@ -209,19 +209,25 @@ def sort_race_results(
     Sorts race results into positive lap times and negative/zero lap times.
 
     Args:
-        race_results (Dict[str, Race]): A dictionary mapping racer abbreviations to `Race` objects.
+        race_results (Dict[str, Race]): A dictionary
+        mapping racer abbreviations to `Race` objects.
         order (str): The sorting order ('asc' or 'desc').
 
     Returns:
-        SortedRaceResults: An object containing sorted positive and negative lap times.
+        SortedRaceResults: An object containing sorted
+        positive and negative lap times.
     """
 
     positive_times = [
-        (abbr, race) for abbr, race in race_results.items() if race.lap_time.total_seconds() > 0
+        (abbr, race)
+        for abbr, race in race_results.items()
+        if race.lap_time.total_seconds() > 0
     ]
 
     negative_times = [
-        (abbr, race) for abbr, race in race_results.items() if race.lap_time.total_seconds() <= 0
+        (abbr, race)
+        for abbr, race in race_results.items()
+        if race.lap_time.total_seconds() <= 0
     ]
 
     sorted_positives = sorted(
@@ -246,12 +252,15 @@ def print_report(
     Generates a formatted report for the top 15 racers and the rest.
 
     Args:
-        sorted_results (SortedRaceResults): A dataclass containing sorted race results.
+        sorted_results (SortedRaceResults):
+        A dataclass containing sorted race results.
 
     Returns:
         str: Formatted race report as a string.
     """
-    sorted_lap_times = sorted_results.positive_times + sorted_results.negative_times
+    sorted_lap_times = (
+            sorted_results.positive_times + sorted_results.negative_times
+    )
 
     max_name_width = max(len(race.racer.name) for _, race in sorted_lap_times)
     max_team_width = max(len(race.racer.team) for _, race in sorted_lap_times)
