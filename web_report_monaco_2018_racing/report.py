@@ -105,6 +105,13 @@ class Race:
 
 @dataclass
 class SortedRaceResults:
+    """
+        Stores sorted race results, separating valid and invalid lap times.
+
+        Returns:
+            List of drivers with valid lap times (positive_times)
+            and a list of drivers with invalid lap times (negative_times).
+    """
     positive_times: List[Tuple[str, Race]]
     negative_times: List[Tuple[str, Race]]
 
