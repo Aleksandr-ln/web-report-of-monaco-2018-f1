@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from .report import build_report, format_timedelta, parse_abbreviations
+from .report import build_report, format_timedelta, parse_abbreviations, sort_race_results
 from .config import START_LOG, END_LOG, ABBREVIATIONS_FILE
 
 app = Flask(__name__)
@@ -9,29 +9,12 @@ def report():
     order = request.args.get("order", "asc")
     race_results = build_report(START_LOG, END_LOG, ABBREVIATIONS_FILE)
 
-    positive_times = [item for item in race_results.items() if item[1].lap_time.total_seconds() > 0]
-    negative_times = [item for item in race_results.items() if item[1].lap_time.total_seconds() <= 0]
-
-    sorted_positives = sorted(
-        positive_times,
-        key=lambda item: item[1].lap_time.total_seconds(),
-        reverse=(order == "desc")
-    )
-
-    sorted_negatives = sorted(
-        negative_times,
-        key=lambda item: item[1].lap_time.total_seconds(),
-        reverse=(order == "desc")
-    )
-
-    top_15 = sorted_positives[:15]
-
-    others = sorted_positives[15:] + sorted_negatives
+    sorted_results = sort_race_results(race_results, order)
 
     return render_template(
         "report.html",
-        top_15=top_15,
-        others=others,
+        top_15=sorted_results.positive_times[:15],
+        others=sorted_results.positive_times[15:] + sorted_results.negative_times,
         order=order,
         format_timedelta=format_timedelta
     )

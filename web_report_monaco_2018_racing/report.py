@@ -6,10 +6,18 @@ This module processes log files containing Formula 1 racing data for the
 Monaco 2018 Grand Prix qualification stage. It calculates lap times for racers,
 sorts them by performance, and generates a formatted report.
 
+Configuration:
+    The paths for the required log files are imported from `config.py`:
+    - START_LOG: Path to the start log file.
+    - END_LOG: Path to the end log file.
+    - ABBREVIATIONS_FILE: Path to the abbreviations file.
+
 Classes:
     Racer: A dataclass representing a racer with a name and team.
     Race: A dataclass representing a race session with a racer, start time,
           end time, and lap time calculation.
+    SortedRaceResults: A dataclass storing sorted race results into
+          positive and negative lap times.
 
 Functions:
     parse_log(file_path: str) -> Dict[str, datetime]:
@@ -30,20 +38,26 @@ Functions:
     format_timedelta(delta: timedelta) -> str:
         Formats a timedelta object into 'm:ss.mmm'.
 
-    print_report(
+    sort_race_results(
         race_results: Dict[str, Race],
         order: str
-    ) -> None:
-        Prints the report for the top 15 racers and the rest.
+    ) -> SortedRaceResults:
+        Sorts race results into positive lap times and negative/zero lap times.
+
+    print_report(
+        sorted_results: SortedRaceResults
+    ) -> str:
+        Generates a formatted report for the top 15 racers and the rest.
 
 Example Usage:
-    race_results = build_report(START_LOG, END_LOG, ABBREVIATIONS_FILE)
-    print_report(race_results)
+    report_data = build_report(START_LOG, END_LOG, ABBREVIATIONS_FILE)
+    sorted_results = sort_race_results(report_data)
+    print(print_report(sorted_results))
 """
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, Optional
+from typing import Dict, List, Tuple, Optional
 
 DATE_FORMAT = "%Y-%m-%d_%H:%M:%S.%f"
 
@@ -87,6 +101,10 @@ class Race:
             return self.end_time - self.start_time
         return timedelta(0)
 
+@dataclass
+class SortedRaceResults:
+    positive_times: List[Tuple[str, Race]]
+    negative_times: List[Tuple[str, Race]]
 
 def parse_log(file_path: str) -> Dict[str, datetime]:
     """
@@ -130,6 +148,21 @@ def parse_abbreviations(file_path: str) -> Dict[str, Racer]:
             abbreviations[key] = Racer(name=name, team=team)
     return abbreviations
 
+def format_timedelta(delta: timedelta) -> str:
+    """
+    Formats a timedelta object into 'm:ss.mmm'.
+
+    Args:
+        delta (timedelta): The time difference to format.
+
+    Returns:
+        str: The formatted time difference as a string.
+    """
+    total_seconds = delta.total_seconds()
+    minutes = int(total_seconds // 60)
+    seconds = int(total_seconds % 60)
+    milliseconds = round((total_seconds % 1) * 1000)
+    return f"{minutes}:{seconds:02}.{milliseconds:03}"
 
 def build_report(
         start_path: str,
@@ -163,80 +196,83 @@ def build_report(
     return race_results
 
 
-def format_timedelta(delta: timedelta) -> str:
+
+
+
+def sort_race_results(
+        race_results: Dict[str, "Race"],
+        order: str = "asc"
+) -> SortedRaceResults:
     """
-    Formats a timedelta object into 'm:ss.mmm'.
+    Sorts race results into positive lap times and negative/zero lap times.
 
     Args:
-        delta (timedelta): The time difference to format.
+        race_results (Dict[str, Race]): A dictionary mapping racer abbreviations to `Race` objects.
+        order (str): The sorting order ('asc' or 'desc').
 
     Returns:
-        str: The formatted time difference as a string.
+        SortedRaceResults: An object containing sorted positive and negative lap times.
     """
-    total_seconds = delta.total_seconds()
-    minutes = int(total_seconds // 60)
-    seconds = int(total_seconds % 60)
-    milliseconds = round((total_seconds % 1) * 1000)
-    return f"{minutes}:{seconds:02}.{milliseconds:03}"
 
+    positive_times = [
+        (abbr, race) for abbr, race in race_results.items() if race.lap_time.total_seconds() > 0
+    ]
+
+    negative_times = [
+        (abbr, race) for abbr, race in race_results.items() if race.lap_time.total_seconds() <= 0
+    ]
+
+    sorted_positives = sorted(
+        positive_times,
+        key=lambda item: item[1].lap_time.total_seconds(),
+        reverse=(order == "desc")
+    )
+
+    sorted_negatives = sorted(
+        negative_times,
+        key=lambda item: item[1].lap_time.total_seconds(),
+        reverse=(order == "desc")
+    )
+
+    return SortedRaceResults(sorted_positives, sorted_negatives)
 
 def print_report(
-        race_results: Dict[str, Race],
-        order: str = "asc"
+        sorted_results: SortedRaceResults
 ) -> str:
-    """
-    Prints the report for the top 15 racers and the rest.
+    """"
+    Generates a formatted report for the top 15 racers and the rest.
 
     Args:
-        race_results (Dict[str, Race]): A dictionary mapping racer
-        abbreviations to `Race` objects.
+        sorted_results (SortedRaceResults): A dataclass containing sorted race results.
 
-        order (str): The sorting order for the report ('asc' or 'desc').
+    Returns:
+        str: Formatted race report as a string.
     """
-    positive_times = {abbr: race.lap_time for abbr, race in race_results.items(
-    ) if race.lap_time.total_seconds() > 0}
-    negative_or_zero_times = {
-        abbr: race.lap_time
-        for abbr, race in race_results.items()
-        if race.lap_time.total_seconds() <= 0
-    }
+    sorted_lap_times = sorted_results.positive_times + sorted_results.negative_times
 
-    positive_sorted = sorted(positive_times.items(
-    ), key=lambda item: item[1], reverse=(order == "desc"))
-    negative_sorted = sorted(negative_or_zero_times.items(
-    ), key=lambda item: item[1], reverse=(order == "desc"))
-
-    sorted_lap_times = positive_sorted + negative_sorted
-
-    max_name_width = max(len(race.racer.name)
-                         for race in race_results.values())
-    max_team_width = max(len(race.racer.team)
-                         for race in race_results.values())
-
+    max_name_width = max(len(race.racer.name) for _, race in sorted_lap_times)
+    max_team_width = max(len(race.racer.team) for _, race in sorted_lap_times)
     max_line_number = len(sorted_lap_times)
     number_width = len(str(max_line_number))
 
     report_lines = []
 
-    for count, (abbr, lap_time) in enumerate(sorted_lap_times[:15], 1):
-        race = race_results[abbr]
+    for count, (abbr, race) in enumerate(sorted_lap_times[:15], 1):
         report_lines.append(
             f"{str(count).rjust(number_width)}. "
             f"{race.racer.name:<{max_name_width}} | "
             f"{race.racer.team:<{max_team_width}} | "
-            f"{format_timedelta(lap_time)}"
+            f"{format_timedelta(race.lap_time)}"
         )
 
-    report_lines.append("\n" + "-" * (number_width + 2 + max_name_width +
-          3 + max_team_width + 3 + 9) + "\n")
+    report_lines.append("\n" + "-" * (number_width + 2 + max_name_width + 3 + max_team_width + 3 + 9) + "\n")
 
-    for count, (abbr, lap_time) in enumerate(sorted_lap_times[15:], 16):
-        race = race_results[abbr]
+    for count, (abbr, race) in enumerate(sorted_lap_times[15:], 16):
         report_lines.append(
             f"{str(count).rjust(number_width)}. "
             f"{race.racer.name:<{max_name_width}} | "
             f"{race.racer.team:<{max_team_width}} | "
-            f"{format_timedelta(lap_time)}"
+            f"{format_timedelta(race.lap_time)}"
         )
 
     return "\n".join(report_lines)
