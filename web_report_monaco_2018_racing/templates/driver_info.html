@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ driver.racer.name }} - Driver Info</title>
+    <style>
+		table {
+			border-collapse: collapse;
+			width: 50%;
+			max-width: 600px;
+			font-family: Arial, sans-serif;
+			margin-bottom: 20px;
+		}
+		th, td {
+			border: 1px solid black;
+			padding: 6px;
+			text-align: left;
+			font-size: 14px;
+		}
+		th {
+			background-color: #f2f2f2;
+			font-weight: bold;
+		}
+		th:nth-child(3), td:nth-child(3) { 
+			text-align: center;
+		}
+		h1 {
+			font-size: 26px;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+
+    <h1>Driver Information</h1>
+
+    <table>
+        <tr>
+            <th>Driver</th>
+            <th>Team</th>
+            <th>Lap Time</th>
+        </tr>
+        <tr>
+            <td>{{ driver.racer.name }}</td>
+            <td>{{ driver.racer.team }}</td>
+            <td>{{ format_timedelta(driver.lap_time) }}</td>
+        </tr>
+    </table>
+
+</body>
+</html>

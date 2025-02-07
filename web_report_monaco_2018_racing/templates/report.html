@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Race Report</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            max-width: 700px; 
+            font-family: Arial, sans-serif;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 6px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        th:nth-child(2), th:nth-child(3) {
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: blue;
+            font-weight: bold;
+        }
+        a:hover {
+            color: red;
+        }
+        th:nth-child(1), td:nth-child(1) { 
+            width: 40px;
+            text-align: center;
+        }
+        th:nth-child(4), td:nth-child(4) { 
+            width: 80px;
+            text-align: center;
+        }
+		h1 {
+			font-size: 26px;
+			font-weight: bold;
+		}
+        h2 {
+            font-size: 20px;
+            margin-top: 30px;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Race Report</h1>
+
+    <p>
+        <a href="{{ url_for('report', order='asc') }}">Sort Ascending</a> | 
+        <a href="{{ url_for('report', order='desc') }}">Sort Descending</a>
+    </p>
+
+    <h2>Qualified for Q2</h2>
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Driver</th>
+            <th>Team</th>
+            <th>Lap Time</th>
+        </tr>
+        {% for abbr, race in top_15 %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ race.racer.name }}</td>
+            <td>{{ race.racer.team }}</td>
+            <td>{{ format_timedelta(race.lap_time) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% if others %}
+    <h2>Non-Qualifiers</h2>
+    <table>
+        <tr>
+            <th>#</th>
+            <th>Driver</th>
+            <th>Team</th>
+            <th>Lap Time</th>
+        </tr>
+        {% for abbr, race in others %}
+        <tr>
+            <td>{{ loop.index + top_15|length }}</td>
+            <td>{{ race.racer.name }}</td>
+            <td>{{ race.racer.team }}</td>
+            <td>{{ format_timedelta(race.lap_time) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+</body>
+</html>
