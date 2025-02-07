@@ -53,7 +53,7 @@ pip install -r requirements.txt
 
 ### 3. Run the Flask server:
 ```sh
-flask run
+flask --app app run
 ```
 
 ⚡ By default, the app will be available at:
