@@ -1,6 +1,4 @@
 Flask
 pytest
 coverage
-unittest
-datetime
 typing
