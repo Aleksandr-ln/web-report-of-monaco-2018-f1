@@ -57,9 +57,10 @@ Example Usage:
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 DATE_FORMAT = "%Y-%m-%d_%H:%M:%S.%f"
+
 
 @dataclass
 class Racer:
@@ -101,10 +102,12 @@ class Race:
             return self.end_time - self.start_time
         return timedelta(0)
 
+
 @dataclass
 class SortedRaceResults:
     positive_times: List[Tuple[str, Race]]
     negative_times: List[Tuple[str, Race]]
+
 
 def parse_log(file_path: str) -> Dict[str, datetime]:
     """
@@ -148,6 +151,7 @@ def parse_abbreviations(file_path: str) -> Dict[str, Racer]:
             abbreviations[key] = Racer(name=name, team=team)
     return abbreviations
 
+
 def format_timedelta(delta: timedelta) -> str:
     """
     Formats a timedelta object into 'm:ss.mmm'.
@@ -163,6 +167,7 @@ def format_timedelta(delta: timedelta) -> str:
     seconds = int(total_seconds % 60)
     milliseconds = round((total_seconds % 1) * 1000)
     return f"{minutes}:{seconds:02}.{milliseconds:03}"
+
 
 def build_report(
         start_path: str,
@@ -194,9 +199,6 @@ def build_report(
         for abbr in start_data if abbr in end_data
     }
     return race_results
-
-
-
 
 
 def sort_race_results(
@@ -236,6 +238,7 @@ def sort_race_results(
 
     return SortedRaceResults(sorted_positives, sorted_negatives)
 
+
 def print_report(
         sorted_results: SortedRaceResults
 ) -> str:
@@ -265,7 +268,8 @@ def print_report(
             f"{format_timedelta(race.lap_time)}"
         )
 
-    report_lines.append("\n" + "-" * (number_width + 2 + max_name_width + 3 + max_team_width + 3 + 9) + "\n")
+    report_lines.append("\n" + "-" * (number_width + 2 +
+                        max_name_width + 3 + max_team_width + 3 + 9) + "\n")
 
     for count, (abbr, race) in enumerate(sorted_lap_times[15:], 16):
         report_lines.append(

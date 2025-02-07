@@ -1,8 +1,13 @@
 from flask import Flask, render_template, request
-from .report import build_report, format_timedelta, parse_abbreviations, sort_race_results
-from .config import START_LOG, END_LOG, ABBREVIATIONS_FILE
+
+from .config import ABBREVIATIONS_FILE, END_LOG, START_LOG
+from .report import (
+    build_report, format_timedelta, parse_abbreviations,
+    sort_race_results
+)
 
 app = Flask(__name__)
+
 
 @app.route("/report")
 def report():
@@ -14,10 +19,12 @@ def report():
     return render_template(
         "report.html",
         top_15=sorted_results.positive_times[:15],
-        others=sorted_results.positive_times[15:] + sorted_results.negative_times,
+        others=sorted_results.positive_times[15:] +
+        sorted_results.negative_times,
         order=order,
         format_timedelta=format_timedelta
     )
+
 
 @app.route("/report/drivers")
 def report_drivers():
@@ -32,6 +39,7 @@ def report_drivers():
         reverse=(order == "desc")
     )
     return render_template("drivers.html", drivers=sorted_drivers, order=order, special_wikipedia_names=special_wikipedia_names)
+
 
 @app.route("/report/drivers/")
 def driver_info():

@@ -4,3 +4,4 @@
 .idea/
 __pycache__/
 web_report_monaco_2018_racing/__pycache__/
+tests/.coverage
