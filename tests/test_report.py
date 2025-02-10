@@ -4,7 +4,7 @@ import unittest
 from datetime import datetime, timedelta
 from unittest.mock import mock_open, patch
 
-from web_report_monaco_2018_racing.report import (
+from monaco_2018_racing.report import (
     Race, Racer, SortedRaceResults, build_report,
     format_timedelta, parse_abbreviations,
     parse_log, sort_race_results

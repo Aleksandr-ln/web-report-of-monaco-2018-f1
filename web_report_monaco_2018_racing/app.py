@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 
 from .config import ABBREVIATIONS_FILE, END_LOG, START_LOG
-from .report import (
+from monaco_2018_racing.report import (
     build_report, format_timedelta, parse_abbreviations,
     sort_race_results
 )
