@@ -61,7 +61,7 @@ flask --app app run
 
 ### 4. Run tests:
 ```sh
-pytest tests/
+pytest web_report_monaco_2018_racing/tests/
 ```
 
 Or with test coverage:
