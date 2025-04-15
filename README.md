@@ -19,7 +19,7 @@ It processes log files with start and finish times of drivers, calculates their 
 
 ```sh
 cd existing_repo
-git remote add origin https://git.foxminded.ua/foxstudent107874/task-7-web-report-of-monaco-2018-racing.git
+git remote add origin https://github.com/Aleksandr-ln/web-report-of-monaco-2018-f1.git
 git branch -M main
 git push -uf origin main
 ```
@@ -32,8 +32,8 @@ git push -uf origin main
 
 ### 1. Clone the repository:
 ```sh
-git clone https://git.foxminded.ua/foxstudent107874/task-7-web-report-of-monaco-2018-racing.git
-cd task-7-web-report-of-monaco-2018-racing
+git clone https://github.com/Aleksandr-ln/web-report-of-monaco-2018-f1.git
+cd web-report-of-monaco-2018
 ```
 
 ### 2. Install dependencies:
